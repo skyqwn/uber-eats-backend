@@ -58,14 +58,14 @@ export class UsersService {
       if (!user) {
         return {
           ok: false,
-          error: 'User not found',
+          error: 'User Not found',
         };
       }
       const passwordCorrect = await user.checkPassword(password);
       if (!passwordCorrect) {
         return {
           ok: false,
-          error: 'Wrong Password',
+          error: 'Wrong password',
         };
       }
       const token = this.jwtService.sign(user.id);
@@ -76,22 +76,20 @@ export class UsersService {
     } catch (error) {
       return {
         ok: false,
-        error,
+        error: "Can't log user in",
       };
     }
   }
 
   async findById(id: number): Promise<UserProfileOutput> {
     try {
-      const user = await this.users.findOne({ where: { id } });
-      if (user) {
-        return {
-          ok: true,
-          user,
-        };
-      }
+      const user = await this.users.findOneOrFail({ where: { id } });
+      return {
+        ok: true,
+        user,
+      };
     } catch (error) {
-      return { ok: false, error: 'User not Found' };
+      return { ok: false, error: 'User Not Found' };
     }
   }
 
@@ -104,6 +102,7 @@ export class UsersService {
       if (email) {
         user.email = email;
         user.verified = false;
+        await this.verifications.delete({ user: { id: user.id } });
         const verification = await this.verifications.save(
           this.verifications.create({ user }),
         );
@@ -117,6 +116,7 @@ export class UsersService {
         ok: true,
       };
     } catch (error) {
+      console.log(error);
       return { ok: false, error: 'Could not update profile.' };
     }
   }
@@ -129,7 +129,6 @@ export class UsersService {
       });
       if (verification) {
         verification.user.verified = true;
-        console.log(verification.user);
         await this.users.save(verification.user);
         await this.verifications.delete(verification.id);
         return { ok: true };
@@ -137,7 +136,7 @@ export class UsersService {
       return { ok: false, error: 'Verification not found.' };
     } catch (error) {
       console.log(error);
-      return { ok: false, error };
+      return { ok: false, error: 'Could not verify email.' };
     }
   }
 }

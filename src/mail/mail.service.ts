@@ -10,11 +10,11 @@ export class MailService {
     @Inject(CONFIG_OPTIONS) private readonly options: MailModuleOptions,
   ) {}
 
-  private async sendEmail(
+  async sendEmail(
     subject: string,
     template: string,
     emailVars: EmailVar[],
-  ) {
+  ): Promise<boolean> {
     const form = new FormData();
     form.append(
       'from',
@@ -37,8 +37,9 @@ export class MailService {
           body: form,
         },
       );
+      return true;
     } catch (error) {
-      console.log(error);
+      return false;
     }
   }
 
