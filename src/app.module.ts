@@ -23,6 +23,9 @@ import { Dish } from './restaurants/entities/dish.entity';
 import { OrdersModule } from './orders/orders.module';
 import { Order } from './orders/entities/order.entity';
 import { OrderItem } from './orders/entities/oder-item-entity';
+import { Context } from 'graphql-ws';
+import { CommonModule } from './common/common.module';
+const TOKEN_KEY = 'x-jwt';
 
 @Module({
   imports: [
@@ -43,10 +46,21 @@ import { OrderItem } from './orders/entities/oder-item-entity';
         MAILGUN_FROM_EMAIL: Joi.string().required(),
       }),
     }),
-    GraphQLModule.forRoot<ApolloDriverConfig>({
+    GraphQLModule.forRoot({
       driver: ApolloDriver,
       autoSchemaFile: true,
-      context: ({ req }) => ({ user: req['user'] }),
+      subscriptions: {
+        'graphql-ws': {
+          onConnect: (context: Context) => {
+            const { connectionParams, extra } = context;
+            //@ts-ignore
+            extra.token = connectionParams[TOKEN_KEY];
+          },
+        },
+      },
+      context: ({ req, extra }) => {
+        return { token: req ? req.headers[TOKEN_KEY] : extra.token };
+      },
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -80,15 +94,9 @@ import { OrderItem } from './orders/entities/oder-item-entity';
     UsersModule,
     RestaurantsModule,
     OrdersModule,
+    CommonModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtMiddleware).forRoutes({
-      path: '/graphql',
-      method: RequestMethod.ALL,
-    });
-  }
-}
+export class AppModule {}
