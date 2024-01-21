@@ -1,10 +1,5 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -25,6 +20,9 @@ import { Order } from './orders/entities/order.entity';
 import { OrderItem } from './orders/entities/oder-item-entity';
 import { Context } from 'graphql-ws';
 import { CommonModule } from './common/common.module';
+import { PaymentsModule } from './payments/payments.module';
+import { Payment } from './payments/entities/payment.entity';
+import { ScheduleModule } from '@nestjs/schedule';
 const TOKEN_KEY = 'x-jwt';
 
 @Module({
@@ -80,11 +78,13 @@ const TOKEN_KEY = 'x-jwt';
         Dish,
         Order,
         OrderItem,
+        Payment,
       ],
     }),
     JwtModule.forRoot({
       privateKey: process.env.PRIVATE_KEY,
     }),
+    ScheduleModule.forRoot(),
     MailModule.forRoot({
       apiKey: process.env.MAILGUN_API_KEY,
       fromEmail: process.env.MAILGUN_FROM_EMAIL,
@@ -95,6 +95,7 @@ const TOKEN_KEY = 'x-jwt';
     RestaurantsModule,
     OrdersModule,
     CommonModule,
+    PaymentsModule,
   ],
   controllers: [],
   providers: [],
