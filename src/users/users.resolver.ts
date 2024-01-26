@@ -3,7 +3,7 @@ import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 import {
   CreateAccountOutput,
-  createAccountInput,
+  CreateAccountInput,
 } from './dtos/create-account.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { UseGuards } from '@nestjs/common';
@@ -20,7 +20,7 @@ export class UsersResolver {
 
   @Mutation((returns) => CreateAccountOutput)
   async createAccount(
-    @Args('input') createAccountInput: createAccountInput,
+    @Args('input') createAccountInput: CreateAccountInput,
   ): Promise<CreateAccountOutput> {
     return this.usersService.createAccount(createAccountInput);
   }
