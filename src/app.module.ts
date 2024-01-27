@@ -43,6 +43,10 @@ const TOKEN_KEY = 'x-jwt';
         MAILGUN_API_KEY: Joi.string().required(),
         MAILGUN_DOMAIN_NAME: Joi.string().required(),
         MAILGUN_FROM_EMAIL: Joi.string().required(),
+        AWS_ACCESS_KEY: Joi.string().required(),
+        AWS_SECRET_ACCESS_KEY: Joi.string().required(),
+        AWS_S3_REGION: Joi.string().required(),
+        AWS_BUCKET_NAME: Joi.string().required(),
       }),
     }),
     GraphQLModule.forRoot({

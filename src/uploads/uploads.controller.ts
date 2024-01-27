@@ -5,36 +5,40 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import * as AWS from 'aws-sdk';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
-const BUCKET_NAME = 'kimbaubereats';
+const returnCurrentDate = () => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const hour = date.getHours();
+  const minutes = date.getMinutes();
+  return `${year}년${month}월${day}일${hour}시${minutes}분`;
+};
 
 @Controller('uploads')
 export class UploadsController {
   @Post('')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFile() file) {
-    AWS.config.update({
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    console.log(file);
+    const s3Config = new S3Client({
+      region: process.env.AWS_S3_REGION,
       credentials: {
-        accessKeyId: 'AKIA43LPYJBUYAG2VCF2',
-        secretAccessKey: '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',
+        accessKeyId: process.env.AWS_ACCESS_KEY,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
       },
     });
-    try {
-      const objectName = `${Date.now() + file.originalname}`;
-      console.log(file);
-      await new AWS.S3()
-        .putObject({
-          Body: file.arrayBuffer,
-          Bucket: BUCKET_NAME,
-          Key: objectName,
-          ACL: 'public-read',
-        })
-        .promise();
-      const url = `https://${BUCKET_NAME}.s3.amazonaws.com/${objectName}`;
-      return { url };
-    } catch (error) {
-      return null;
-    }
+
+    const objectName = `${returnCurrentDate() + file.originalname}`;
+    const input = {
+      Body: file.buffer,
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: objectName,
+    };
+    await s3Config.send(new PutObjectCommand(input));
+    const url = `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${objectName}`;
+    return { url };
   }
 }

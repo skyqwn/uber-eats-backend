@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@apollo/server": "^4.10.0",
+    "@aws-sdk/client-s3": "^3.501.0",
     "@nestjs/apollo": "^12.0.11",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.1.1",
@@ -36,6 +37,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "cross-env": "^7.0.3",
+    "dayjs": "^1.11.10",
     "form-data": "^4.0.0",
     "graphql": "^16.8.1",
     "graphql-subscriptions": "^2.0.0",
@@ -56,6 +58,7 @@
     "@types/cron": "^2.4.0",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
+    "@types/multer": "^1.4.11",
     "@types/node": "^20.3.1",
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
